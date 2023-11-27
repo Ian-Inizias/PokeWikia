@@ -1,0 +1,23 @@
+[CAMPER,Liam]
+LoseText = A very good battle, indeed!
+Pokemon = DIGLETT,10
+Pokemon = BONSLY,11
+#-------------------------------
+[LEADER_Brock,Brock]
+Items = FULLRESTORE,FULLRESTORE
+LoseText = Very good.
+Pokemon = GEODUDE,12
+    Gender = male
+    Moves = DEFENSECURL,HEADSMASH,ROCKPOLISH,ROCKTHROW
+    AbilityIndex = 0
+    IV = 20,20,20,20,20,20
+Pokemon = ONIX,14
+    Name = Rocky
+    Gender = male
+    Shiny = yes
+    Moves = HEADSMASH,ROCKTHROW,RAGE,ROCKTOMB
+    AbilityIndex = 0
+    Item = SITRUSBERRY
+    IV = 20,20,20,20,20,20
+    Ball = HEAVYBALL
+#-------------------------------
