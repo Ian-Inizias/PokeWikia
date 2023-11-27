@@ -1,0 +1,166 @@
+﻿@page "/routes"
+
+@using PokeApiNet
+@using PokeWikia.Utils.Models
+@using Encounter = PokeWikia.Utils.Models.Encounter
+
+@inject HttpClient Http
+
+<PageTitle>Routes</PageTitle>
+
+@if (_encounters.Count == 0)
+{
+    <h5>Loading encounters from file...</h5>
+}
+else
+{
+    <Fields>
+        <Field ColumnSize="ColumnSize.Is6">
+            <FieldLabel>Buscar rutas que contengan:</FieldLabel>
+            <FieldBody>
+                <TextEdit Text="@_pokemonNameFilterValue" TextChanged="@OnCustomFilterValueChanged"/>
+            </FieldBody>
+        </Field>
+    </Fields>
+    <DataGrid @ref="_encounterDataGrid"
+              TItem="Encounters"
+              Data="_encounters"
+              DetailRowStartsVisible="false"
+              CustomFilter="@OnCustomFilter">
+        <DataGridColumns>
+            <DataGridCommandColumn/>
+            <DataGridColumn Field="@nameof(Encounters.RouteId)" Caption="RUTA"/>
+        </DataGridColumns>
+        <DetailRowTemplate>
+            @{
+                var encounterList = context.WildEncounters;
+                <DataGrid @ref="_wildEncounterDataGrid"
+                          TItem="Encounter"
+                          Data="encounterList"
+                          Sortable="false"
+                          ShowCaptions="true"
+                          DetailRowStartsVisible="false">
+                    <DataGridColumns>
+                        <DataGridCommandColumn/>
+                        <DataGridColumn Field="@nameof(Encounter.EncounterType)" Caption="TIPO"/>
+                        <DataGridColumn Field="@nameof(Encounter.Frequency)" Caption="FRE."/>
+                    </DataGridColumns>
+                    <DetailRowTemplate Context="encounterContext">
+                        @{
+                            var encounterRatioList = encounterContext.EncounterRatios;
+                            <DataGrid @ref="_encounterRatioDataGrid"
+                                      TItem="EncounterRatio"
+                                      Data="encounterRatioList"
+                                      Sortable="false"
+                                      ShowCaptions="true">
+                                <DataGridColumns>
+                                    <DataGridCommandColumn/>
+                                    <DataGridColumn Field="@nameof(EncounterRatio.Rate)" Caption="RATIO"/>
+                                    <DataGridColumn Field="@nameof(EncounterRatio.Levels)" Caption="LV.">
+                                        <DisplayTemplate Context="levelContext">
+                                            @{
+                                                var levels = (levelContext as EncounterRatio).Levels;
+                                                <label>@levels[0] - @levels[1]</label>
+                                            }
+                                        </DisplayTemplate>
+                                    </DataGridColumn>
+                                    <DataGridColumn Field="@nameof(EncounterRatio.Pokemon)" Caption="IMG">
+                                        <DisplayTemplate Context="pokeContext">
+                                            @{
+                                                var img = (pokeContext as EncounterRatio).Pokemon.Sprites.FrontDefault;
+                                                <img alt="pokemon img" src="@img"/>
+                                            }
+                                        </DisplayTemplate>
+                                    </DataGridColumn>
+                                </DataGridColumns>
+                            </DataGrid>
+                        }
+                    </DetailRowTemplate>
+                </DataGrid>
+            }
+        </DetailRowTemplate>
+    </DataGrid>
+}
+
+@code {
+
+    DataGrid<Encounters> _encounterDataGrid = new();
+    DataGrid<Encounter> _wildEncounterDataGrid = new();
+    DataGrid<EncounterRatio> _encounterRatioDataGrid = new();
+
+    PokeApiClient _pokeApiClient = new();
+
+    List<Encounters> _encounters = new();
+
+    string _pokemonNameFilterValue;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var text = await Http.GetStringAsync("sample-data/sample-essentials-encounters.txt");
+
+        var routes = text.Split("#-------------------------------");
+
+        Encounters encounter = new() { WildEncounters = new List<Encounter>() };
+        Encounter wildEncounter = new() { EncounterRatios = new List<EncounterRatio>() };
+        EncounterRatio encounterRatio = new();
+
+        for (var i = 0; i < routes.Length; i++)
+        {
+            var lines = routes[i].Split(Environment.NewLine);
+            foreach (var l in lines)
+            {
+                if (l.StartsWith('#') || string.IsNullOrWhiteSpace(l))
+                {
+                    if (encounter.WildEncounters.Count > 0)
+                    {
+                        encounter.WildEncounters.Add(wildEncounter);
+                        wildEncounter = new Encounter { EncounterRatios = new List<EncounterRatio>() };
+                        _encounters.Add(encounter);
+                    }
+                    encounter = new Encounters { WildEncounters = new List<Encounter>() };
+                }
+                else if (l.StartsWith('['))
+                {
+                    encounter.RouteId = lines[i];
+                }
+                else if (!l.StartsWith(' '))
+                {
+                    if (wildEncounter.EncounterRatios.Count > 0) encounter.WildEncounters.Add(wildEncounter);
+
+                    var typeString = l.Split(',').Length > 1 ? l.Split(',')[0] : l;
+                    var type = Enum.Parse<EncounterTypes>(typeString);
+
+                    wildEncounter = new Encounter
+                    {
+                        EncounterType = type,
+                        Frequency = l.Split(',').Length > 1 ? int.Parse(l.Split(',')[1]) : 100,
+                        EncounterRatios = new List<EncounterRatio>()
+                    };
+                }
+                else if (l.StartsWith(' '))
+                {
+                    encounterRatio = new EncounterRatio
+                    {
+                        Rate = int.Parse(l.Split(',')[0]),
+                        Pokemon = await _pokeApiClient.GetResourceAsync<Pokemon>(l.Split(',')[1]),
+                        Levels = new[] { int.Parse(l.Split(',')[2]), int.Parse(l.Split(',')[3]) }
+                    };
+
+                    wildEncounter.EncounterRatios.Add(encounterRatio);
+                }
+            }
+        }
+    }
+
+    private Task OnCustomFilterValueChanged(string s)
+    {
+        _pokemonNameFilterValue = s;
+        return _encounterDataGrid.Reload();
+    }
+
+    private bool OnCustomFilter(Encounters encounterData)
+    {
+        return string.IsNullOrEmpty(_pokemonNameFilterValue) || encounterData.WildEncounters.Any(w => w.EncounterRatios.Any(r => r.Pokemon.Name.Contains(_pokemonNameFilterValue, StringComparison.CurrentCultureIgnoreCase)));
+    }
+
+}

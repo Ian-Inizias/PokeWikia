@@ -1,0 +1,95 @@
+﻿@page "/trainers"
+
+@using PokeWikia.Utils.Models
+@using PokeApiNet
+
+<PageTitle>Trainers</PageTitle>
+
+<h1>Trainers</h1>
+
+@if (_trainers.Count == 0)
+{
+    <h5>Loading random trainers...</h5>
+}
+else
+{
+    <DataGrid @ref="_trainerDataGrid"
+              TItem="PokemonTrainer"
+              Data="_trainers"
+              DetailRowStartsVisible="false">
+        <DataGridColumns>
+            <DataGridCommandColumn/>
+            <DataGridColumn Field="@nameof(PokemonTrainer.Name)" Caption="NOMBRE"/>
+            <DataGridColumn Field="@nameof(PokemonTrainer.TrainerType)" Caption="TIPO ENTRENADOR"/>
+            <DataGridColumn Field="@nameof(PokemonTrainer.Sprite)" Caption="IMG">
+                <DisplayTemplate>
+                    @{
+                        var img = (context as PokemonTrainer).Sprite;
+                        <img alt="trainer img" src="@img"/>
+                    }
+                </DisplayTemplate>
+            </DataGridColumn>
+        </DataGridColumns>
+        <DetailRowTemplate>
+            @{
+                var pokemons = context.Team;
+                <DataGrid @ref="_pokemonDataGrid"
+                          TItem="Pokemon"
+                          Data="pokemons"
+                          Sortable="false"
+                          ShowCaptions="true">
+                    <DataGridCommandColumn/>
+                    <DataGridColumn Field="@nameof(Pokemon.Name)" Caption="Nombre"/>
+                    <DataGridColumn Field="@nameof(Pokemon.Id)" Caption="IMG">
+                        <DisplayTemplate Context="pokeContext">
+                            @{
+                                var img = (pokeContext as Pokemon).Sprites.FrontDefault;
+                                <img alt="pokemon img" src="@img"/>
+                            }
+                        </DisplayTemplate>
+                    </DataGridColumn>
+                    <DataGridColumn Field="@nameof(Pokemon.Stats)" Caption="Stats">
+                        <DisplayTemplate Context="pokeContext">
+                            @{
+                                var stats = (pokeContext as Pokemon).Stats;
+                                <DataGrid @ref="_statDataGrid"
+                                          TItem="PokemonStat"
+                                          Data="stats"
+                                          Sortable="false"
+                                          ShowCaptions="true">
+                                    <DataGridCommandColumn/>
+                                    <DataGridColumn Field="@nameof(PokemonStat.Stat)" Caption="Nombre">
+                                        <DisplayTemplate Context="statContext">
+                                            @{
+                                                var stat = (statContext as PokemonStat).Stat;
+                                                <label>@stat.Name</label>
+                                            }
+                                        </DisplayTemplate>
+                                    </DataGridColumn>
+                                    <DataGridColumn Field="@nameof(PokemonStat.BaseStat)" Caption="Base"/>
+                                </DataGrid>
+                            }
+                        </DisplayTemplate>
+                    </DataGridColumn>
+                </DataGrid>
+            }
+        </DetailRowTemplate>
+    </DataGrid>
+}
+
+@code {
+    DataGrid<PokemonTrainer> _trainerDataGrid = new();
+    DataGrid<Pokemon> _pokemonDataGrid = new();
+    DataGrid<PokemonStat> _statDataGrid = new();
+
+    List<PokemonTrainer> _trainers = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        for (var i = 0; i < 1; i++)
+        {
+            _trainers.Add(await PokemonTrainer.Build($"BOT-{i}"));
+        }
+    }
+
+}
