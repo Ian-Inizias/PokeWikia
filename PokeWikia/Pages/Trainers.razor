@@ -3,6 +3,8 @@
 @using PokeWikia.Utils.Models
 @using PokeApiNet
 
+@inject HttpClient Http
+
 <PageTitle>Trainers</PageTitle>
 
 <h1>Trainers</h1>
@@ -16,7 +18,8 @@ else
     <DataGrid @ref="_trainerDataGrid"
               TItem="PokemonTrainer"
               Data="_trainers"
-              DetailRowStartsVisible="false">
+              DetailRowStartsVisible="false"
+              ShowPager>
         <DataGridColumns>
             <DataGridCommandColumn/>
             <DataGridColumn Field="@nameof(PokemonTrainer.Name)" Caption="NOMBRE"/>
@@ -48,29 +51,6 @@ else
                             }
                         </DisplayTemplate>
                     </DataGridColumn>
-                    <DataGridColumn Field="@nameof(Pokemon.Stats)" Caption="Stats">
-                        <DisplayTemplate Context="pokeContext">
-                            @{
-                                var stats = (pokeContext as Pokemon).Stats;
-                                <DataGrid @ref="_statDataGrid"
-                                          TItem="PokemonStat"
-                                          Data="stats"
-                                          Sortable="false"
-                                          ShowCaptions="true">
-                                    <DataGridCommandColumn/>
-                                    <DataGridColumn Field="@nameof(PokemonStat.Stat)" Caption="Nombre">
-                                        <DisplayTemplate Context="statContext">
-                                            @{
-                                                var stat = (statContext as PokemonStat).Stat;
-                                                <label>@stat.Name</label>
-                                            }
-                                        </DisplayTemplate>
-                                    </DataGridColumn>
-                                    <DataGridColumn Field="@nameof(PokemonStat.BaseStat)" Caption="Base"/>
-                                </DataGrid>
-                            }
-                        </DisplayTemplate>
-                    </DataGridColumn>
                 </DataGrid>
             }
         </DetailRowTemplate>
@@ -80,15 +60,43 @@ else
 @code {
     DataGrid<PokemonTrainer> _trainerDataGrid = new();
     DataGrid<Pokemon> _pokemonDataGrid = new();
-    DataGrid<PokemonStat> _statDataGrid = new();
+
+    PokeApiClient _pokeApiClient = new();
 
     List<PokemonTrainer> _trainers = new();
 
     protected override async Task OnInitializedAsync()
     {
-        for (var i = 0; i < 1; i++)
+        var text = await Http.GetStringAsync("sample-data/sample-essentials-trainers.txt");
+
+        var trainers = text.Split("#-------------------------------");
+
+        List<Pokemon> team = new();
+
+        foreach (var t in trainers)
         {
-            _trainers.Add(await PokemonTrainer.Build($"BOT-{i}"));
+            if (string.IsNullOrWhiteSpace(t)) break;
+
+            var lines = t.Split(Environment.NewLine);
+
+            var pokes = lines.Where(l => l.StartsWith("Pokemon"));
+            foreach (var pokeLine in pokes)
+            {
+                var pokeName = pokeLine.Split('=')[1].Split(',')[0].Trim();
+                team.Add(await _pokeApiClient.GetResourceAsync<Pokemon>(pokeName));
+            }
+
+            var line = lines.First(l => l.StartsWith("["));
+            var trainerLine = line.Substring(1, line.Length - 3).Split(',');
+
+            _trainers.Add(new PokemonTrainer
+            {
+                Name = trainerLine[1],
+                TrainerType = Enum.Parse<TrainerTypes>(trainerLine[0]),
+                Team = team
+            });
+
+            team = new List<Pokemon>();
         }
     }
 

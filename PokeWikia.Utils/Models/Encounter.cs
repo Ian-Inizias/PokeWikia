@@ -5,21 +5,27 @@ namespace PokeWikia.Utils.Models;
 public enum EncounterTypes
 {
     Land,
+    LandMorning,
     LandNight,
+    BugContest,
     Water,
     WaterNight,
     OldRod,
     GoodRod,
-    SuperRod
+    SuperRod,
+    Cave,
+    HeadbuttLow,
+    HeadbuttHigh,
+    RockSmash,
 }
 
 public class Encounters
 {
     public string RouteId { get; set; }
-    public List<Encounter> WildEncounters { get; set; }
+    public List<WildEncounter> WildEncounters { get; set; }
 }
 
-public class Encounter
+public class WildEncounter
 {
     public int Frequency { get; set; }
     public EncounterTypes EncounterType { get; set; }

@@ -4,11 +4,21 @@ namespace PokeWikia.Utils.Models;
 
 public enum TrainerTypes
 {
-    GymLeader = 0,
-    BugcatcherF = 1,
-    BugcatcherM = 2,
-    Grunt = 3,
-    Camper = 4,
+    CAMPER,
+    LEADER_Brock,
+    TEAMROCKET_M,
+    TEAMROCKET_F,
+    RIVAL1,
+    CHAMPION,
+    SWIMMER2_F,
+    POKEMONTRAINER_May,
+    COOLCOUPLE,
+    LASS,
+    BEAUTY,
+    FISHERMAN,
+    HIKER,
+    PICNICKER,
+    YOUNGSTER
 }
 
 public class PokemonTrainer
@@ -17,8 +27,6 @@ public class PokemonTrainer
     public TrainerTypes TrainerType { get; set; }
     public List<Pokemon> Team { get; set; }
     public string Sprite { get; set; }
-
-    private static PokeApiClient _pokeApiClient = new();
 
     public PokemonTrainer()
     {
@@ -30,24 +38,5 @@ public class PokemonTrainer
         TrainerType = type;
         Sprite = sprite;
         Team = team;
-    }
-
-    /// <summary>
-    /// Builds a random trainer
-    /// </summary>
-    /// <param name="name">Name for the trainer</param>
-    /// <returns>Pokemon trainer with 6 random pokemons</returns>
-    public static async Task<PokemonTrainer> Build(string name)
-    {
-        Random rng = new();
-        var team = new List<Pokemon>();
-        var values = Enum.GetValues(typeof(TrainerTypes));
-        var type = (TrainerTypes)(values.GetValue(rng.Next(values.Length)) ?? throw new InvalidOperationException());
-        for (var i = 0; i < 6; i++)
-        {
-            team.Add(await _pokeApiClient.GetResourceAsync<Pokemon>(rng.Next(1, 1000)));
-        }
-
-        return new PokemonTrainer(name, type, team[0].Sprites.FrontDefault, team);
     }
 }

@@ -2,7 +2,6 @@
 
 @using PokeApiNet
 @using PokeWikia.Utils.Models
-@using Encounter = PokeWikia.Utils.Models.Encounter
 
 @inject HttpClient Http
 
@@ -26,7 +25,8 @@ else
               TItem="Encounters"
               Data="_encounters"
               DetailRowStartsVisible="false"
-              CustomFilter="@OnCustomFilter">
+              CustomFilter="@OnCustomFilter"
+              ShowPager>
         <DataGridColumns>
             <DataGridCommandColumn/>
             <DataGridColumn Field="@nameof(Encounters.RouteId)" Caption="RUTA"/>
@@ -35,15 +35,15 @@ else
             @{
                 var encounterList = context.WildEncounters;
                 <DataGrid @ref="_wildEncounterDataGrid"
-                          TItem="Encounter"
+                          TItem="WildEncounter"
                           Data="encounterList"
                           Sortable="false"
                           ShowCaptions="true"
                           DetailRowStartsVisible="false">
                     <DataGridColumns>
                         <DataGridCommandColumn/>
-                        <DataGridColumn Field="@nameof(Encounter.EncounterType)" Caption="TIPO"/>
-                        <DataGridColumn Field="@nameof(Encounter.Frequency)" Caption="FRE."/>
+                        <DataGridColumn Field="@nameof(WildEncounter.EncounterType)" Caption="TIPO"/>
+                        <DataGridColumn Field="@nameof(WildEncounter.Frequency)" Caption="FRE."/>
                     </DataGridColumns>
                     <DetailRowTemplate Context="encounterContext">
                         @{
@@ -85,7 +85,7 @@ else
 @code {
 
     DataGrid<Encounters> _encounterDataGrid = new();
-    DataGrid<Encounter> _wildEncounterDataGrid = new();
+    DataGrid<WildEncounter> _wildEncounterDataGrid = new();
     DataGrid<EncounterRatio> _encounterRatioDataGrid = new();
 
     PokeApiClient _pokeApiClient = new();
@@ -100,28 +100,28 @@ else
 
         var routes = text.Split("#-------------------------------");
 
-        Encounters encounter = new() { WildEncounters = new List<Encounter>() };
-        Encounter wildEncounter = new() { EncounterRatios = new List<EncounterRatio>() };
+        Encounters encounter = new() { WildEncounters = new List<WildEncounter>() };
+        WildEncounter wildEncounter = new() { EncounterRatios = new List<EncounterRatio>() };
         EncounterRatio encounterRatio = new();
 
-        for (var i = 0; i < routes.Length; i++)
+        foreach (var r in routes)
         {
-            var lines = routes[i].Split(Environment.NewLine);
+            var lines = r.Split(Environment.NewLine);
             foreach (var l in lines)
             {
                 if (l.StartsWith('#') || string.IsNullOrWhiteSpace(l))
                 {
-                    if (encounter.WildEncounters.Count > 0)
+                    if (encounter.WildEncounters.Count > 0 || (encounter.WildEncounters.Count == 0 && wildEncounter.EncounterRatios.Count > 0))
                     {
                         encounter.WildEncounters.Add(wildEncounter);
-                        wildEncounter = new Encounter { EncounterRatios = new List<EncounterRatio>() };
+                        wildEncounter = new WildEncounter { EncounterRatios = new List<EncounterRatio>() };
                         _encounters.Add(encounter);
                     }
-                    encounter = new Encounters { WildEncounters = new List<Encounter>() };
+                    encounter = new Encounters { WildEncounters = new List<WildEncounter>() };
                 }
                 else if (l.StartsWith('['))
                 {
-                    encounter.RouteId = lines[i];
+                    encounter.RouteId = l;
                 }
                 else if (!l.StartsWith(' '))
                 {
@@ -130,7 +130,7 @@ else
                     var typeString = l.Split(',').Length > 1 ? l.Split(',')[0] : l;
                     var type = Enum.Parse<EncounterTypes>(typeString);
 
-                    wildEncounter = new Encounter
+                    wildEncounter = new WildEncounter
                     {
                         EncounterType = type,
                         Frequency = l.Split(',').Length > 1 ? int.Parse(l.Split(',')[1]) : 100,
@@ -145,7 +145,7 @@ else
                         Pokemon = await _pokeApiClient.GetResourceAsync<Pokemon>(l.Split(',')[1]),
                         Levels = new[] { int.Parse(l.Split(',')[2]), int.Parse(l.Split(',')[3]) }
                     };
-
+                    
                     wildEncounter.EncounterRatios.Add(encounterRatio);
                 }
             }
