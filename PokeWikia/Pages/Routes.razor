@@ -52,7 +52,8 @@ else
                                       TItem="EncounterRatio"
                                       Data="encounterRatioList"
                                       Sortable="false"
-                                      ShowCaptions="true">
+                                      ShowCaptions="true"
+                                      ReadData="async _ => await LoadEncounterPokemon(encounterRatioList)">
                                 <DataGridColumns>
                                     <DataGridCommandColumn/>
                                     <DataGridColumn Field="@nameof(EncounterRatio.Rate)" Caption="RATIO"/>
@@ -67,7 +68,7 @@ else
                                     <DataGridColumn Field="@nameof(EncounterRatio.Pokemon)" Caption="IMG">
                                         <DisplayTemplate Context="pokeContext">
                                             @{
-                                                var img = (pokeContext as EncounterRatio).Pokemon.Sprites.FrontDefault;
+                                                var img = (pokeContext as EncounterRatio).Pokemon.Sprites?.FrontDefault;
                                                 <img alt="pokemon img" src="@img"/>
                                             }
                                         </DisplayTemplate>
@@ -79,6 +80,42 @@ else
                 </DataGrid>
             }
         </DetailRowTemplate>
+        <NextPageButtonTemplate>
+            <Icon Name="IconName.StepForward" TextColor="TextColor.Primary"/>
+        </NextPageButtonTemplate>
+        <PreviousPageButtonTemplate>
+            <Icon Name="IconName.StepBackward" TextColor="TextColor.Primary"/>
+        </PreviousPageButtonTemplate>
+        <LastPageButtonTemplate>
+            <Icon Name="IconName.Forward" TextColor="TextColor.Primary"/>
+        </LastPageButtonTemplate>
+        <FirstPageButtonTemplate>
+            <Icon Name="IconName.Backward" TextColor="TextColor.Primary"/>
+        </FirstPageButtonTemplate>
+        <TotalItemsTemplate>
+            <Badge Color="Color.Primary">@context.TotalItems total items</Badge>
+        </TotalItemsTemplate>
+        <TotalItemsShortTemplate>
+            <Badge Color="Color.Primary">@context.TotalItems</Badge>
+        </TotalItemsShortTemplate>
+        <ItemsPerPageTemplate></ItemsPerPageTemplate>
+        <PageSelectorTemplate>
+            <Select TextColor="TextColor.Primary" @bind-SelectedValue="@context.CurrentPage" Size="Size.Small">
+                @for (var i = context.FirstVisiblePage; i <= context.LastVisiblePage; ++i)
+                {
+                    var pageNumber = i;
+                    <SelectItem Value="@pageNumber">@pageNumber</SelectItem>
+                }
+            </Select>
+        </PageSelectorTemplate>
+        <PageSizesTemplate>
+            <Select TextColor="TextColor.Primary" @bind-SelectedValue="@context.CurrentPageSize" Size="Size.Small">
+                @foreach (var curPageSize in context.PageSizes)
+                {
+                    <SelectItem Value="@curPageSize">@curPageSize</SelectItem>
+                }
+            </Select>
+        </PageSizesTemplate>
     </DataGrid>
 }
 
@@ -142,10 +179,10 @@ else
                     encounterRatio = new EncounterRatio
                     {
                         Rate = int.Parse(l.Split(',')[0]),
-                        Pokemon = await _pokeApiClient.GetResourceAsync<Pokemon>(l.Split(',')[1]),
+                        Pokemon = new Pokemon { Name = l.Split(',')[1] },
                         Levels = new[] { int.Parse(l.Split(',')[2]), int.Parse(l.Split(',')[3]) }
                     };
-                    
+
                     wildEncounter.EncounterRatios.Add(encounterRatio);
                 }
             }
@@ -161,6 +198,14 @@ else
     private bool OnCustomFilter(Encounters encounterData)
     {
         return string.IsNullOrEmpty(_pokemonNameFilterValue) || encounterData.WildEncounters.Any(w => w.EncounterRatios.Any(r => r.Pokemon.Name.Contains(_pokemonNameFilterValue, StringComparison.CurrentCultureIgnoreCase)));
+    }
+
+    private async Task LoadEncounterPokemon(IEnumerable<EncounterRatio> encounterRatios)
+    {
+        foreach (var encounterR in encounterRatios)
+        {
+            encounterR.Pokemon = await _pokeApiClient.GetResourceAsync<Pokemon>(encounterR.Pokemon.Name);
+        }
     }
 
 }
