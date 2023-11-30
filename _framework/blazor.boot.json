@@ -1,7 +1,7 @@
 {
   "entryAssembly": "PokeWikia",
   "resources": {
-    "hash": "sha256-lMkq2mLDL8ut2hTDmBp+WwIbqJTGglpFCbRrFkhtqP8=",
+    "hash": "sha256-yutYWkcMpxYblyUChQ5H9mcV4TfKd6qxoJHpovSdyJU=",
     "runtime": {
       "dotnet.7.0.14.mikshhdjmu.js": "sha256-YWGUknGRzP/fgO6YjvCJKPVQNZAPEd6ll+rHfQEIW+I=",
       "dotnet.timezones.blat": "sha256-t5xviiOQTfAsF0UDhmcyalKiaehUmf/sqJl97tmPM0M=",
@@ -37,8 +37,8 @@
       "Microsoft.JSInterop.WebAssembly.dll": "sha256-fNs7kWVthiOX/JzL//klJF3OAPsaOsVGIVYMFb/7Emg=",
       "netstandard.dll": "sha256-OQRImGFCxu2+FheaXVfKygfFFYl2DQpm/NzeGu7dZrM=",
       "PokeApiNet.dll": "sha256-B4Z88lIepPUEH4Axfo87wD1QUfw9gUH2x9F7EuOBnTo=",
-      "PokeWikia.dll": "sha256-f0RJLao6QA/Pd1LxrPyXztXOmIJ2VscbTs5J8iBXmyE=",
-      "PokeWikia.Utils.dll": "sha256-P2KSLRpX8J/Nwc73wF9iNOuLRtbQcgFW5CrRhB0f5TY=",
+      "PokeWikia.dll": "sha256-HgCb8pYbWAMQeYzRt51MaxsZpu0Bs9IwL65ZFP02sps=",
+      "PokeWikia.Utils.dll": "sha256-lDlF+fSA1PU76y875ce21mDN6QiIJat3lv7o6Jlk/O4=",
       "System.Collections.Concurrent.dll": "sha256-EKsm7t6rvnenhB8lVtpg08hMyXW141XO5G8lz+PNZ+g=",
       "System.Collections.dll": "sha256-iC/nBj4IZGzUBrvAIyxkzp6snADx2S0WppWGyJ74RCc=",
       "System.Collections.Immutable.dll": "sha256-IKoKeGh+mZ3pHylfV9Ix1PLqkLJP3nfPqLytAPSZ+MU=",
@@ -60,7 +60,7 @@
       "System.Net.Http.dll": "sha256-HT7rMOgbwlHLYx215S57OYXS+QDWPUlX1ZsyPf0+q8s=",
       "System.Net.Primitives.dll": "sha256-nOoLJh4+suOf3q43JBSknW99ybub9wjOpNW1tKX4V2I=",
       "System.ObjectModel.dll": "sha256-azqBvEOaKOLhKohlGm48n6/9lmFUSV4Bsm0Gh0hjm9I=",
-      "System.Private.CoreLib.dll": "sha256-vF8v70VfwGshu5oqFzuMYAVSm6tbIgLVQaKmrrdkDj8=",
+      "System.Private.CoreLib.dll": "sha256-P3DGLabJ+paQ57nB9rapWd+n8FTAmibp+XRAg0rjtys=",
       "System.Private.Uri.dll": "sha256-e2rqWwziEmPXDhFuLGyH8MvmDEOGy7TpD9QpKOrOzsc=",
       "System.Reflection.dll": "sha256-+5F7EzKSb4ucC5ooXw7+fi362zmah+Iq/EJwdFyp1K4=",
       "System.Reflection.Extensions.dll": "sha256-If3Gq0GPKCFRmLmD51pYLG+GxyVKlO4weq+hGtZz3FY=",
