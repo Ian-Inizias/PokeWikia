@@ -2,6 +2,9 @@
 
 namespace PokeWikia.Utils.Models;
 
+/// <summary>
+/// Enum with all the trainer types
+/// </summary>
 public enum TrainerTypes
 {
     CAMPER,
@@ -21,11 +24,29 @@ public enum TrainerTypes
     YOUNGSTER
 }
 
+/// <summary>
+/// All the trainer information
+/// </summary>
 public class PokemonTrainer
 {
+    /// <summary>
+    /// Name of the trainer
+    /// </summary>
     public string Name { get; set; }
+
+    /// <summary>
+    /// Trainer type
+    /// </summary>
     public TrainerTypes TrainerType { get; set; }
+
+    /// <summary>
+    /// Trainers pokemon team
+    /// </summary>
     public List<Pokemon> Team { get; set; }
+
+    /// <summary>
+    /// Trainer custom sprite
+    /// </summary>
     public string Sprite { get; set; }
 
     public PokemonTrainer()

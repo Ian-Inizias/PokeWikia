@@ -7,15 +7,17 @@
 
 <PageTitle>Routes</PageTitle>
 
+<h1>Routes</h1>
+
 @if (_encounters.Count == 0)
 {
-    <h5>Loading encounters from file... (First time may take a while)</h5>
+    <h5>Loading encounters...</h5>
 }
 else
 {
     <Fields>
         <Field ColumnSize="ColumnSize.Is6">
-            <FieldLabel>Buscar rutas que contengan:</FieldLabel>
+            <FieldLabel>Search for poke:</FieldLabel>
             <FieldBody>
                 <TextEdit Text="@_pokemonNameFilterValue" TextChanged="@OnCustomFilterValueChanged"/>
             </FieldBody>
@@ -26,7 +28,8 @@ else
               Data="_encounters"
               DetailRowStartsVisible="false"
               CustomFilter="@OnCustomFilter"
-              ShowPager>
+              ShowPager
+              PagerOptions="new DataGridPagerOptions { ButtonSize = Size.Small }">
         <DataGridColumns>
             <DataGridCommandColumn/>
             <DataGridColumn Field="@nameof(Encounters.RouteId)" Caption="RUTA"/>
@@ -62,6 +65,14 @@ else
                                             @{
                                                 var levels = (levelContext as EncounterRatio).Levels;
                                                 <label>@levels[0] - @levels[1]</label>
+                                            }
+                                        </DisplayTemplate>
+                                    </DataGridColumn>
+                                    <DataGridColumn Field="@nameof(EncounterRatio.Pokemon)" Caption="NOMBRE">
+                                        <DisplayTemplate Context="nameContext">
+                                            @{
+                                                var name = (nameContext as EncounterRatio).Pokemon.Name;
+                                                <label>@name.ToUpper()</label>
                                             }
                                         </DisplayTemplate>
                                     </DataGridColumn>

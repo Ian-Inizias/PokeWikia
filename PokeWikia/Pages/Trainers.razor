@@ -11,7 +11,7 @@
 
 @if (_trainers.Count == 0)
 {
-    <h5>Loading random trainers... (First time may take a while)</h5>
+    <h5>Loading trainers...</h5>
 }
 else
 {
@@ -19,7 +19,8 @@ else
               TItem="PokemonTrainer"
               Data="_trainers"
               DetailRowStartsVisible="false"
-              ShowPager>
+              ShowPager
+              PagerOptions="new DataGridPagerOptions { ButtonSize = Size.Small }">
         <DataGridColumns>
             <DataGridCommandColumn/>
             <DataGridColumn Field="@nameof(PokemonTrainer.Name)" Caption="NOMBRE"/>
@@ -35,19 +36,19 @@ else
         </DataGridColumns>
         <DetailRowTemplate>
             @{
+                var team = context.Team;
                 <DataGrid @ref="_pokemonDataGrid"
                           TItem="Pokemon"
-                          Data="context.Team"
+                          Data="team"
                           Sortable="false"
                           ShowCaptions="true"
-                          ReadData="async _ => await LoadTeam(context.Team)">
+                          ReadData="async _ => await LoadTeam(team)">
                     <DataGridCommandColumn/>
-                    <DataGridColumn Field="@nameof(Pokemon.Name)" Caption="Nombre"/>
-                    <DataGridColumn Field="@nameof(Pokemon.Id)" Caption="IMG">
+                    <DataGridColumn Field="@nameof(Pokemon.Name)" Caption="NOMBRE"/>
+                    <DataGridColumn Field="@nameof(Pokemon.Sprites)" Caption="IMG">
                         <DisplayTemplate Context="pokeContext">
                             @{
-                                var poke = pokeContext as Pokemon;
-                                var img = poke.Sprites?.FrontDefault;
+                                var img = (pokeContext as Pokemon).Sprites?.FrontDefault;
                                 <img alt="pokemon img" src="@img"/>
                             }
                         </DisplayTemplate>
@@ -98,8 +99,14 @@ else
     DataGrid<PokemonTrainer> _trainerDataGrid = new();
     DataGrid<Pokemon> _pokemonDataGrid = new();
 
+    /// <summary>
+    /// Client API to call for all pokemon data
+    /// </summary>
     PokeApiClient _pokeApiClient = new();
 
+    /// <summary>
+    /// List with all the pokemon trainers
+    /// </summary>
     List<PokemonTrainer> _trainers = new();
 
     protected override async Task OnInitializedAsync()
@@ -135,11 +142,15 @@ else
         }
     }
 
-    private async Task LoadTeam(IList<Pokemon> team)
+    ///<summary>
+    /// Loads the sprites for the pokemon team on click
+    /// </summary>
+    private async Task LoadTeam(IEnumerable<Pokemon> team)
     {
-        for (var i = 0; i < team.Count; i++)
+        foreach (var poke in team)
         {
-            team[i] = await _pokeApiClient.GetResourceAsync<Pokemon>(team[i].Name);
+            var pokeNew = await _pokeApiClient.GetResourceAsync<Pokemon>(poke.Name);
+            poke.Sprites = pokeNew.Sprites;
         }
     }
 
