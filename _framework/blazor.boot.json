@@ -1,7 +1,7 @@
 {
   "entryAssembly": "PokeWikia",
   "resources": {
-    "hash": "sha256-yutYWkcMpxYblyUChQ5H9mcV4TfKd6qxoJHpovSdyJU=",
+    "hash": "sha256-ljF/aToYghR+S9PaiBUj6diSGIBPWafbP56YiXPVPZY=",
     "runtime": {
       "dotnet.7.0.14.mikshhdjmu.js": "sha256-YWGUknGRzP/fgO6YjvCJKPVQNZAPEd6ll+rHfQEIW+I=",
       "dotnet.timezones.blat": "sha256-t5xviiOQTfAsF0UDhmcyalKiaehUmf/sqJl97tmPM0M=",
@@ -37,8 +37,8 @@
       "Microsoft.JSInterop.WebAssembly.dll": "sha256-fNs7kWVthiOX/JzL//klJF3OAPsaOsVGIVYMFb/7Emg=",
       "netstandard.dll": "sha256-OQRImGFCxu2+FheaXVfKygfFFYl2DQpm/NzeGu7dZrM=",
       "PokeApiNet.dll": "sha256-B4Z88lIepPUEH4Axfo87wD1QUfw9gUH2x9F7EuOBnTo=",
-      "PokeWikia.dll": "sha256-HgCb8pYbWAMQeYzRt51MaxsZpu0Bs9IwL65ZFP02sps=",
-      "PokeWikia.Utils.dll": "sha256-lDlF+fSA1PU76y875ce21mDN6QiIJat3lv7o6Jlk/O4=",
+      "PokeWikia.dll": "sha256-G967T6bXjHIwJYgP3cV15mLDf7iYDBZkS4pPXL6O2us=",
+      "PokeWikia.Utils.dll": "sha256-0cx6WmPk1Y6m3V54aM4US5TyjZndzWEsOgVZ2Phmj2M=",
       "System.Collections.Concurrent.dll": "sha256-EKsm7t6rvnenhB8lVtpg08hMyXW141XO5G8lz+PNZ+g=",
       "System.Collections.dll": "sha256-iC/nBj4IZGzUBrvAIyxkzp6snADx2S0WppWGyJ74RCc=",
       "System.Collections.Immutable.dll": "sha256-IKoKeGh+mZ3pHylfV9Ix1PLqkLJP3nfPqLytAPSZ+MU=",
