@@ -17,6 +17,7 @@ public enum EncounterTypes
     GoodRod,
     SuperRod,
     Cave,
+    CaveNight,
     HeadbuttLow,
     HeadbuttHigh,
     RockSmash,
